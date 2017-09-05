@@ -16,10 +16,29 @@ namespace TestProject
 
 		TEST_METHOD(TestMethod1)
 		{
-			std::wstring suffix = L"";
+			auto inputFilename = L"Resources/input.txt";
+			auto outputFilename = L"Resources/output.txt";
+			Test(inputFilename, outputFilename);
+		}
 
-			auto inputFile = L"Resources/input" + suffix + L".txt";
-			std::ifstream inputStream(inputFile, std::ios::in);
+		TEST_METHOD(TestMethod2)
+		{
+			auto inputFilename = L"Resources/input2.txt";
+			auto outputFilename = L"Resources/output2.txt";
+			Test(inputFilename, outputFilename);
+		}
+
+		TEST_METHOD(TestMethod3)
+		{
+			auto inputFilename = L"Resources/input3.txt";
+			auto outputFilename = L"Resources/output3.txt";
+			Test(inputFilename, outputFilename);
+		}
+
+	private:
+		void Test(const std::wstring& inputFilename, const std::wstring& outputFilename)
+		{
+			std::ifstream inputStream(inputFilename, std::ios::in);
 			if (!inputStream.good())
 				throw std::runtime_error("File not found");
 
@@ -36,22 +55,21 @@ namespace TestProject
 			{
 				auto difference = second - first;
 				auto diffrenceInMilliseconds = std::chrono::duration<float, std::milli>(difference).count();
-				
+
 				std::ofstream timestamps(L"Resources/Timestamps.txt", std::ios::out);
 				timestamps << diffrenceInMilliseconds;
 			}
 
-			auto outputFile = L"Resources/output" + suffix + L".txt";
-			Validate(outputFile, &buffer);
+			Validate(outputFilename, &buffer);
 			//OutputToFile(L"Resources/Result.txt", std::istream(&buffer));
 		}
 
-	private:
 		void Validate(const std::wstring& expectedOutputFilename, std::basic_stringbuf<char>* actualOutputBuffer)
 		{
 			std::istream actualOutputStream(actualOutputBuffer);
 			std::ifstream expectedOutputStream(expectedOutputFilename, std::ios::in);
 
+			std::size_t line = 1;
 			while (!expectedOutputStream.eof())
 			{
 				std::string expected;
@@ -61,6 +79,7 @@ namespace TestProject
 				actualOutputStream >> actual;
 
 				Assert::AreEqual(expected, actual);
+				++line;
 			}
 		}
 
