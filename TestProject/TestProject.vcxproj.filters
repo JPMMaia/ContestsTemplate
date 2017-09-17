@@ -29,6 +29,9 @@
     <ClCompile Include="UnitTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utils\LargeIntegerTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="Resources\input.txt" />
@@ -37,5 +40,9 @@
     <Text Include="Resources\output2.txt" />
     <Text Include="Resources\input3.txt" />
     <Text Include="Resources\output3.txt" />
+    <Text Include="Resources\input4.txt" />
+    <Text Include="Resources\output4.txt" />
+    <Text Include="Resources\input5.txt" />
+    <Text Include="Resources\output5.txt" />
   </ItemGroup>
 </Project>

@@ -35,6 +35,21 @@ namespace TestProject
 			Test(inputFilename, outputFilename);
 		}
 
+		TEST_METHOD(TestMethod4)
+		{
+			auto inputFilename = L"Resources/input4.txt";
+			auto outputFilename = L"Resources/output4.txt";
+			Test(inputFilename, outputFilename);
+		}
+
+
+		TEST_METHOD(TestMethod5)
+		{
+			auto inputFilename = L"Resources/input5.txt";
+			auto outputFilename = L"Resources/output5.txt";
+			Test(inputFilename, outputFilename);
+		}
+
 	private:
 		void Test(const std::wstring& inputFilename, const std::wstring& outputFilename)
 		{
@@ -49,7 +64,7 @@ namespace TestProject
 
 			std::chrono::high_resolution_clock clock;
 			auto first = clock.now();
-			compute();
+			Compute();
 			auto second = clock.now();
 
 			{
