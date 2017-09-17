@@ -29,5 +29,8 @@
     <ClInclude Include="LargeInteger\LargeInteger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LargeInteger\InfInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

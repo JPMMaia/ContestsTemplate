@@ -9,8 +9,8 @@ class LargeInteger
 {
 public:
 	LargeInteger();
-	LargeInteger(std::size_t integer);
-	LargeInteger(const std::string& str);
+	LargeInteger(std::size_t value);
+	LargeInteger(const std::string& value);
 
 public:
 	bool operator==(const LargeInteger& other);
@@ -24,7 +24,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& outputStream, const LargeInteger& integer);
 
 private:
-	std::vector<std::uint64_t> m_value;
+	std::string m_value;
 };
 
 inline std::istream& operator>>(std::istream& inputStream, LargeInteger& integer)
@@ -39,19 +39,13 @@ inline std::istream& operator>>(std::istream& inputStream, LargeInteger& integer
 
 inline std::ostream& operator<<(std::ostream& outputStream, const LargeInteger& integer)
 {
-	outputStream << std::setfill(' ') << std::setw(0) << *integer.m_value.rbegin();
-
-	for (auto valueIt = integer.m_value.rbegin() + 1; valueIt != integer.m_value.rend(); ++valueIt)
-	{
-		outputStream << std::setfill('0') << std::setw(19) << *valueIt;
-	}
-
+	outputStream << integer.m_value;
 	return outputStream;
 }
 
 namespace std
 {
-	inline std::string to_string(const LargeInteger & integer)
+	inline std::string to_string(const LargeInteger& integer)
 	{
 		std::stringstream ss;
 		ss << integer;

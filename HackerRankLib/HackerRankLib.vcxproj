@@ -119,6 +119,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LargeInteger\InfInt.h" />
     <ClInclude Include="LargeInteger\LargeInteger.h" />
     <ClInclude Include="main.h" />
   </ItemGroup>

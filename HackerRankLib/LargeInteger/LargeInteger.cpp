@@ -4,92 +4,49 @@
 #include <queue>
 
 LargeInteger::LargeInteger() :
-	m_value(1, 0)
+	m_value("0")
 {
 }
-LargeInteger::LargeInteger(std::size_t integer) :
-	m_value(1, integer)
+LargeInteger::LargeInteger(std::size_t value) :
+	m_value(std::to_string(value))
 {
 }
-LargeInteger::LargeInteger(const std::string & str)
+LargeInteger::LargeInteger(const std::string & value) :
+	m_value(value)
 {
-	auto numberOfDigits = str.size();
-	auto maxNumberOfDigits = 19;
-
-	auto lastPartitionSize = numberOfDigits % maxNumberOfDigits;
-	auto partitionSize = numberOfDigits / maxNumberOfDigits;
-
-	m_value.reserve(partitionSize);
-
-	for (std::size_t i = 0; i < partitionSize; ++i)
-	{
-		auto startIndex = numberOfDigits - (i + 1) * maxNumberOfDigits;
-		auto substr = str.substr(startIndex, maxNumberOfDigits);
-		m_value.emplace_back(std::stoull(substr));
-	}
-
-	if(lastPartitionSize != 0)
-		m_value.emplace_back(std::stoull(str.substr(0, lastPartitionSize)));
 }
 
 bool LargeInteger::operator==(const LargeInteger& other)
 {
-	if (m_value.size() != other.m_value.size())
-		return false;
-	
-	for (std::size_t i = 0; i < m_value.size(); ++i)
-		if (m_value[i] != other.m_value[i])
-			return false;
-
-	return true;
+	return m_value == other.m_value;
 }
 bool LargeInteger::operator<(const LargeInteger& other)
 {
-	if (m_value.size() == other.m_value.size())
-	{
-		for (std::size_t i = 0; i < m_value.size(); ++i)
-		{
-			auto rIndex = m_value.size() - 1 - i;
-
-			if (m_value[rIndex] < other.m_value[rIndex])
-				return true;
-			else if (m_value[rIndex] > other.m_value[rIndex])
-				return false;
-		}
-	}
-	else if (m_value.size() < other.m_value.size())
-	{
+	if (m_value.size() < other.m_value.size())
 		return true;
-	}
 
-	return false;
+	if (m_value.size() > other.m_value.size())
+		return false;
+
+	return m_value < other.m_value;
 }
 const LargeInteger& LargeInteger::operator++()
 {
-	for (auto valueIt = m_value.begin(); valueIt != m_value.end(); ++valueIt)
-	{
-		if (*valueIt == std::numeric_limits<std::size_t>::max())
-		{
-			*valueIt = 0;
-		}
-		else
-		{
-			*valueIt += 1;
-			break;
-		}
-	}
-
+	*this = *this + 1;
 	return *this;
 }
 
 LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer1)
 {
-	auto integer0Str = std::to_string(integer0);
-	auto integer1Str = std::to_string(integer1);
+	const auto& integer0Str = integer0.m_value;
+	const auto& integer1Str = integer1.m_value;
 
 	auto size = std::max(integer0Str.size(), integer1Str.size());
 
-	std::string result(size + 1, ' ');
+	std::string result;
+	result.reserve(size + 1);
+	result.resize(size);
+
 	char carry = 0;
 	for (std::size_t i = 0; i < size; ++i)
 	{
@@ -109,7 +66,7 @@ LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer
 		}
 
 		auto n0Plusn1 = n0 + n1 + carry;
-		result[i] = std::to_string(n0Plusn1 % 10).at(0);
+		result[size - 1 - i] = static_cast<char>(n0Plusn1 % 10) + '0';
 
 		if (n0Plusn1 > 9)
 			carry = 1;
@@ -117,15 +74,15 @@ LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer
 			carry = 0;
 	}
 
-	result[size] = carry == 1 ? '1' : '0';
-
-	std::reverse(result.begin(), result.end());
+	if (carry == 1)
+		result.insert(result.begin(), '1');
+	
 	return result;
 }
 LargeInteger operator*(const LargeInteger& integer0, const LargeInteger& integer1)
 {
-	auto integer0Str = std::to_string(integer0);
-	auto integer1Str = std::to_string(integer1);
+	const auto& integer0Str = integer0.m_value;
+	const auto& integer1Str = integer1.m_value;
 
 	//    999
 	//    999
@@ -139,18 +96,18 @@ LargeInteger operator*(const LargeInteger& integer0, const LargeInteger& integer
 	for (std::size_t i = 0; i < integer1Str.size(); ++i)
 	{
 		auto index1 = integer1Str.size() - 1 - i;
-		auto n1 = std::stoull(integer1Str.substr(index1, 1));
+		auto n1 = integer1Str[index1] - '0';
 
 		LargeInteger sum = 0;
 		for (std::size_t j = 0; j < integer0Str.size(); ++j)
 		{
 			auto index0 = integer0Str.size() - 1 - j;
-			auto n0 = std::stoull(integer0Str.substr(index0, 1));
+			auto n0 = integer0Str[index0] - '0';
 
 			sum = sum + (std::to_string(n0 * n1) + std::string(j, '0'));
 		}
 
-		result = result + (std::to_string(sum) + std::string(i, '0'));
+		result = result + (sum.m_value + std::string(i, '0'));
 	}
 
 	return result;
