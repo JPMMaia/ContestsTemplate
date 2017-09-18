@@ -2,112 +2,177 @@
 
 #include <algorithm>
 #include <queue>
+#include <stack>
 
-LargeInteger::LargeInteger() :
-	m_value("0")
+LargeInteger::LargeInteger()
 {
 }
-LargeInteger::LargeInteger(std::size_t value) :
-	m_value(std::to_string(value))
+LargeInteger::LargeInteger(std::size_t integer)
 {
+	if (integer == 0)
+	{
+		m_value.push_back(0);
+		return;
+	}
+
+	std::queue<IntegerType> value;
+
+	while (integer > 0)
+	{
+		auto remainder = integer % s_base;
+		value.push(remainder);
+
+		integer /= s_base;
+	}
+
+	m_value.reserve(value.size());
+	while (!value.empty())
+	{
+		m_value.emplace_back(value.front());
+		value.pop();
+	}
 }
-LargeInteger::LargeInteger(const std::string & value) :
-	m_value(value)
+LargeInteger::LargeInteger(const std::string & str)
 {
+	// TODO
+
+	auto numberOfDigits = str.size();
+	auto maxNumberOfDigits = 19;
+
+	auto lastPartitionSize = numberOfDigits % maxNumberOfDigits;
+	auto partitionSize = numberOfDigits / maxNumberOfDigits;
+
+	m_value.reserve(partitionSize);
+
+	for (std::size_t i = 0; i < partitionSize; ++i)
+	{
+		auto startIndex = numberOfDigits - (i + 1) * maxNumberOfDigits;
+		auto substr = str.substr(startIndex, maxNumberOfDigits);
+		m_value.emplace_back(std::stoull(substr));
+	}
+
+	if (lastPartitionSize != 0)
+		m_value.emplace_back(std::stoull(str.substr(0, lastPartitionSize)));
 }
 
 bool LargeInteger::operator==(const LargeInteger& other)
 {
-	return m_value == other.m_value;
+	if (m_value.size() != other.m_value.size())
+		return false;
+
+	for (std::size_t i = 0; i < m_value.size(); ++i)
+		if (m_value[i] != other.m_value[i])
+			return false;
+
+	return true;
 }
 bool LargeInteger::operator<(const LargeInteger& other)
 {
-	if (m_value.size() < other.m_value.size())
+	if (m_value.size() == other.m_value.size())
+	{
+		for (std::size_t i = 0; i < m_value.size(); ++i)
+		{
+			auto rIndex = m_value.size() - 1 - i;
+
+			if (m_value[rIndex] < other.m_value[rIndex])
+				return true;
+			else if (m_value[rIndex] > other.m_value[rIndex])
+				return false;
+		}
+	}
+	else if (m_value.size() < other.m_value.size())
+	{
 		return true;
+	}
 
-	if (m_value.size() > other.m_value.size())
-		return false;
-
-	return m_value < other.m_value;
+	return false;
 }
 const LargeInteger& LargeInteger::operator++()
 {
-	*this = *this + 1;
+	for (auto valueIt = m_value.begin(); valueIt != m_value.end(); ++valueIt)
+	{
+		if (*valueIt == s_upperBound)
+		{
+			*valueIt = 0;
+
+			if (valueIt == m_value.end() - 1)
+			{
+				m_value.push_back(1);
+				break;
+			}
+		}
+		else
+		{
+			*valueIt += 1;
+			break;
+		}
+	}
+
+	return *this;
+}
+
+LargeInteger& LargeInteger::operator+=(const LargeInteger& other)
+{
+	*this = *this + other;
 	return *this;
 }
 
 LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer1)
 {
-	const auto& integer0Str = integer0.m_value;
-	const auto& integer1Str = integer1.m_value;
+	LargeInteger result;
 
-	auto size = std::max(integer0Str.size(), integer1Str.size());
+	std::size_t maxSize = std::max(integer0.m_value.size(), integer1.m_value.size());
+	result.m_value.reserve(maxSize + 1);
 
-	std::string result;
-	result.reserve(size + 1);
-	result.resize(size);
-
-	char carry = 0;
-	for (std::size_t i = 0; i < size; ++i)
+	LargeInteger::IntegerType carry = 0;
+	for (std::size_t i = 0; i < maxSize; ++i)
 	{
-		char n0 = 0;
-		char n1 = 0;
+		std::size_t n0 = 0;
+		if (i < integer0.m_value.size())
+			n0 = integer0.m_value[i];
 
-		if (i < integer0Str.size())
+		std::size_t n1 = 0;
+		if (i < integer1.m_value.size())
+			n1 = integer1.m_value[i];
+
+		LargeInteger::IntegerType sum = n0 + n1 + carry;
+		result.m_value.emplace_back(sum % LargeInteger::s_base);
+
+		if (sum > LargeInteger::s_upperBound)
 		{
-			auto index0 = integer0Str.size() - 1 - i;
-			n0 = integer0Str[index0] - '0';
+			carry = sum / LargeInteger::s_base;
 		}
-
-		if (i < integer1Str.size())
-		{
-			auto index1 = integer1Str.size() - 1 - i;
-			n1 = integer1Str[index1] - '0';
-		}
-
-		auto n0Plusn1 = n0 + n1 + carry;
-		result[size - 1 - i] = static_cast<char>(n0Plusn1 % 10) + '0';
-
-		if (n0Plusn1 > 9)
-			carry = 1;
 		else
+		{
 			carry = 0;
+		}
 	}
 
-	if (carry == 1)
-		result.insert(result.begin(), '1');
-	
+	if (carry > 0)
+		result.m_value.emplace_back(carry);
+
 	return result;
 }
 LargeInteger operator*(const LargeInteger& integer0, const LargeInteger& integer1)
 {
-	const auto& integer0Str = integer0.m_value;
-	const auto& integer1Str = integer1.m_value;
-
-	//    999
-	//    999
-	// ------  
-	//   8991
-	//  8991
-	// 8991
-	// 998001
-
 	LargeInteger result = 0;
-	for (std::size_t i = 0; i < integer1Str.size(); ++i)
+
+	for (std::size_t i = 0; i < integer1.m_value.size(); ++i)
 	{
-		auto index1 = integer1Str.size() - 1 - i;
-		auto n1 = integer1Str[index1] - '0';
+		auto n1 = integer1.m_value[i];
 
 		LargeInteger sum = 0;
-		for (std::size_t j = 0; j < integer0Str.size(); ++j)
+		for (std::size_t j = 0; j < integer0.m_value.size(); ++j)
 		{
-			auto index0 = integer0Str.size() - 1 - j;
-			auto n0 = integer0Str[index0] - '0';
+			LargeInteger multiplicationResult;
+			multiplicationResult.m_value.reserve(integer0.m_value.size() + integer1.m_value.size() + 1);
+			multiplicationResult.m_value.resize(i + j, 0);
+			multiplicationResult.m_value.emplace_back(integer0.m_value[j] * n1);
 
-			sum = sum + (std::to_string(n0 * n1) + std::string(j, '0'));
+			sum += multiplicationResult;
 		}
 
-		result = result + (sum.m_value + std::string(i, '0'));
+		result += sum;
 	}
 
 	return result;
