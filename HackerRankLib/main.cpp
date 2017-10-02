@@ -1,4 +1,4 @@
-void compute()
+void Compute()
 {
 
 }
@@ -6,7 +6,7 @@ void compute()
 #if !defined(TEST)
 int main()
 {
-	compute();
+	Compute();
 	return 0;
 }
 #endif

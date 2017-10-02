@@ -18,7 +18,37 @@ namespace TestProject
 			}
 
 			{
-				std::string integerStr = "1231939810381029831028312093123131212123131";
+				std::string integerStr = "0";
+				LargeInteger integer = integerStr;
+				Assert::AreEqual(integerStr, std::to_string(integer));
+			}
+
+			{
+				std::string integerStr = "1";
+				LargeInteger integer = integerStr;
+				Assert::AreEqual(integerStr, std::to_string(integer));
+			}
+
+			{
+				std::string integerStr = "7";
+				LargeInteger integer = integerStr;
+				Assert::AreEqual(integerStr, std::to_string(integer));
+			}
+
+			{
+				std::string integerStr = "16";
+				LargeInteger integer = integerStr;
+				Assert::AreEqual(integerStr, std::to_string(integer));
+			}
+
+			{
+				std::string integerStr = "1234";
+				LargeInteger integer = integerStr;
+				Assert::AreEqual(integerStr, std::to_string(integer));
+			}
+
+			{
+				std::string integerStr = "12319398103";
 				LargeInteger integer = integerStr;
 				Assert::AreEqual(integerStr, std::to_string(integer));
 			}
@@ -60,14 +90,19 @@ namespace TestProject
 				LargeInteger integer1 = 9999;
 				Assert::IsTrue(LargeInteger(19998) == integer0 + integer1);
 			}
+
+			{
+				LargeInteger integer = 12309132;
+				Assert::IsTrue(LargeInteger(24618264) == integer + integer);
+			}
 		}
 
 		TEST_METHOD(LargeIntegerTestOperatorMult)
 		{
 			{
-				LargeInteger integer0 = 9;
-				LargeInteger integer1 = 9;
-				Assert::IsTrue(LargeInteger(81) == integer0 * integer1);
+				LargeInteger integer0 = 2;
+				LargeInteger integer1 = 2;
+				Assert::IsTrue(LargeInteger(4) == integer0 * integer1);
 			}
 
 			{

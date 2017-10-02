@@ -122,7 +122,7 @@ LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer
 	LargeInteger result;
 
 	std::size_t maxSize = std::max(integer0.m_value.size(), integer1.m_value.size());
-	result.m_value.reserve(maxSize + 1);
+	result.m_value.resize(maxSize + 1);
 
 	LargeInteger::IntegerType carry = 0;
 	for (std::size_t i = 0; i < maxSize; ++i)
@@ -136,7 +136,7 @@ LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer
 			n1 = integer1.m_value[i];
 
 		LargeInteger::IntegerType sum = n0 + n1 + carry;
-		result.m_value.emplace_back(sum % LargeInteger::s_base);
+		result.m_value[i] = (sum % LargeInteger::s_base);
 
 		if (sum > LargeInteger::s_upperBound)
 		{
@@ -149,7 +149,9 @@ LargeInteger operator+(const LargeInteger& integer0, const LargeInteger& integer
 	}
 
 	if (carry > 0)
-		result.m_value.emplace_back(carry);
+		result.m_value[result.m_value.size() - 1] = (carry);
+	else
+		result.m_value.pop_back();
 
 	return result;
 }
@@ -165,9 +167,8 @@ LargeInteger operator*(const LargeInteger& integer0, const LargeInteger& integer
 		for (std::size_t j = 0; j < integer0.m_value.size(); ++j)
 		{
 			LargeInteger multiplicationResult;
-			multiplicationResult.m_value.reserve(integer0.m_value.size() + integer1.m_value.size() + 1);
-			multiplicationResult.m_value.resize(i + j, 0);
-			multiplicationResult.m_value.emplace_back(integer0.m_value[j] * n1);
+			multiplicationResult.m_value.resize(i + j + 1, 0);
+			multiplicationResult.m_value[i + j] = integer0.m_value[j] * n1;
 
 			sum += multiplicationResult;
 		}

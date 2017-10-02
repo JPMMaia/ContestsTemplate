@@ -10,7 +10,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace TestProject
 {		
-	TEST_CLASS(UnitTests)
+	TEST_CLASS(FilesTests)
 	{
 	public:
 
