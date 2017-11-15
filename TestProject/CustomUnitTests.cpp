@@ -4,7 +4,9 @@
 
 #include <chrono>
 #include <iostream>
+#include <iterator>
 #include <fstream>
+#include <numeric>
 #include <random>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -63,6 +65,20 @@ namespace TestProject
 			}
 			expectedOutputStream << missingNumber;
 
+			Test(inputStream, expectedOutputStream);
+		}
+		
+		TEST_METHOD(LargeSequenceTest)
+		{
+			std::stringstream inputStream;
+			std::stringstream expectedOutputStream;
+
+			std::size_t elementCount = 4000000;
+			inputStream << elementCount << std::endl;
+
+			for (std::size_t i = 0; i < elementCount; ++i)
+				inputStream << i << " ";
+			
 			Test(inputStream, expectedOutputStream);
 		}
 
